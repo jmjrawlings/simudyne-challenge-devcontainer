@@ -1,0 +1,30 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.195.0/containers/java
+{
+	"name": "Simudyne",
+		
+	"build": {
+		"dockerfile": "../Dockerfile",
+		"context": ".."
+	},
+
+	"workspaceMount": "source=${localWorkspaceFolder},target=/model,type=bind,consistency=cached", 
+	"workspaceFolder": "/model",
+				
+	"mounts":[
+		"source=${localWorkspaceFolder}/.simudyne/settings.xml,target=/root/.m2/.settings.xml,type=bind,consistency=cached",
+		"source=${localWorkspaceFolder}/.simudyne,target=/root/.simudyne,type=bind,consistency=cached"
+	],
+					
+	// Set *default* container specific settings.json values on container create.
+	"settings": { 
+		"java.jdt.ls.java.home": "/docker-java-home",
+		"maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn"
+	},
+	
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"vscjava.vscode-java-pack",
+		"redhat.vscode-xml"
+	],
+}
