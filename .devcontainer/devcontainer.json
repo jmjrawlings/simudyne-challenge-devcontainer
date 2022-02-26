@@ -10,11 +10,6 @@
 
 	"workspaceMount": "source=${localWorkspaceFolder},target=/model,type=bind,consistency=cached", 
 	"workspaceFolder": "/model",
-				
-	"mounts":[
-		"source=${localWorkspaceFolder}/.simudyne/settings.xml,target=/root/.m2/.settings.xml,type=bind,consistency=cached",
-		"source=${localWorkspaceFolder}/.simudyne,target=/root/.simudyne,type=bind,consistency=cached"
-	],
 					
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
