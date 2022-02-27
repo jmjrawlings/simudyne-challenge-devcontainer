@@ -18,16 +18,13 @@ COPY .simudyne/.license .simudyne/
 # Use Simudyne Access Token to create the global Maven settings file
 COPY .simudyne/.token .simudyne/
 RUN ( \
-    echo '<?xml version="1.0" encoding="UTF-8"?><settings><servers><server><id>simudyne.jfrog.io</id>'; \
+    echo '<?xml version="1.0" encoding="UTF-8"?>' ; \
+    echo '<settings><servers><server>' ; \
+    echo '<id>simudyne.jfrog.io</id>'; \
     cat .simudyne/.token ; \
-    echo '</server></servers></settings>'\
+    echo '</server></servers>' ; \
+    echo '</settings>'\
     ) >> .m2/settings.xml
-
-# Resolve project dependencies on container build (could also be done afterwards)
-RUN mkdir /model
-WORKDIR /model
-ADD pom.xml .
-RUN mvn dependency:resolve
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
