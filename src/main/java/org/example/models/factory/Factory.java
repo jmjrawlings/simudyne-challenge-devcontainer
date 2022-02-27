@@ -14,8 +14,10 @@ import java.io.File;
 @ModelSettings(timeUnit = "MILLIS")
 public class Factory extends AgentBasedModel<Globals> {
     private static final Logger logger = LoggerFactory.getLogger("org.example.models.factory");
+    
     @Input
     public String A;
+    
     @Input
     public String B;
 

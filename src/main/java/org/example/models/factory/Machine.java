@@ -13,10 +13,12 @@ public class Machine extends Agent<Globals> {
      * product currently processed at this machine. Null if none here
      */
     private Product currentProduct = null;
+    
     @Constant
-    String name; // loaded from csv
+    public String name; // loaded from csv
+    
     @Variable(name="Products done by machine")
-    int numProductsDone = 0;
+    public int numProductsDone = 0;
 
     // ACTIONS
 

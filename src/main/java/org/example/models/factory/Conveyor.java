@@ -1,6 +1,5 @@
 package org.example.models.factory;
 
-import com.google.errorprone.annotations.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import simudyne.core.abm.Action;
@@ -8,9 +7,7 @@ import simudyne.core.abm.Agent;
 import simudyne.core.annotations.Constant;
 import simudyne.core.annotations.Variable;
 
-import javax.crypto.Mac;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Conveyor extends Agent<Globals> {
     private static final Logger logger = LoggerFactory.getLogger("org.example.models.factory");
@@ -18,13 +15,16 @@ public class Conveyor extends Agent<Globals> {
      * FIFO queue of all products currently queuing in this conveyor
      */
     private LinkedList<Product> queue = new LinkedList<>();
+    
     @Constant
-    String name; // loaded from csv
-    double speed_mperms = 0.002223; // meter per millisecond (i.e. m/tick)
-    double length_m = 9000; // physical length of conveyor
+    public String name; // loaded from csv
+    
+    public double speed_mperms = 0.002223; // meter per millisecond (i.e. m/tick)
+    
+    public double length_m = 9000; // physical length of conveyor
+
     @Variable
     public int queueLength = 0; // log how many in queue currently, for UI outputs
-
 
     /**
      * Initialize conveyor queue with given number of products. Only call on first step
@@ -59,11 +59,13 @@ public class Conveyor extends Agent<Globals> {
                 double rateNewProductsPerMS = currConveyor.getGlobals().rateNewProducts / (60. * 1000.); // from "per min" to "per ms"
                 int numNewProductsThisTick = (int) Math.floor(rateNewProductsPerMS);
                 double remainder = (rateNewProductsPerMS - numNewProductsThisTick);
+
                 if (remainder >= 1 || currConveyor.getPrng().uniform(0, 1).sample() < remainder) {
                     // add remainder only if prob checked (so "1.25" would be 1 each tick and 2 each 4 ticks)
                     numNewProductsThisTick++;
                     //logger.info("Conveyor "+currConveyor.getID()+" created "+numNewProductsThisTick+" new products on tick "+currConveyor.getContext().getTick());
                 }
+
                 for (int i = 0; i < numNewProductsThisTick; i++) {
                     double cycleTime_ticks = currConveyor.getPrng().uniform(
                             currConveyor.getGlobals().cycleTimeMin_ticks,
@@ -145,8 +147,6 @@ public class Conveyor extends Agent<Globals> {
 
     /**
      * Call when product enters conveyor at the far end
-     *
-     * @param product the product entering
      */
     private void enterQueue(Product product) {
         queue.addLast(product);
