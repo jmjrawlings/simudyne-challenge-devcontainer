@@ -1,5 +1,3 @@
-.simudyne/*.*
-!.simudyne/.gitkeep
 .idea
 target
 *.iml
