@@ -2,14 +2,20 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.195.0/containers/java
 {
 	"name": "Simudyne",
-		
+			
 	"build": {
 		"dockerfile": "../Dockerfile",
 		"context": ".."
 	},
 
+	"runArgs": [
+		"--hostname", "host"
+	],
+		
 	"workspaceMount": "source=${localWorkspaceFolder},target=/model,type=bind,consistency=cached", 
 	"workspaceFolder": "/model",
+	
+	"postCreateCommand": "mvn dependency:resolve",
 					
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
