@@ -7,22 +7,28 @@
 		"dockerfile": "../Dockerfile",
 		"context": ".."
 	},
-
+			
 	"runArgs": [
 		"--hostname", "host"
 	],
-		
+	
+	// Set default working folder as '/model'
 	"workspaceMount": "source=${localWorkspaceFolder},target=/model,type=bind,consistency=cached", 
 	"workspaceFolder": "/model",
 	
-	"postCreateCommand": "mvn dependency:resolve",
-					
+	// Use a docker volume as the Maven repository so dependencies
+	// are cached even if the container/project changes
+	"mounts": ["source=simudyne-maven-repo,target=/root/.m2/repository"],
+
+	// Resolve dependencies on container attach
+	"postAttachCommand": "mvn dependency:resolve dependency:resolve-plugins",
+									
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
 		"java.jdt.ls.java.home": "/docker-java-home",
 		"maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn"
 	},
-	
+		
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"vscjava.vscode-java-pack",
