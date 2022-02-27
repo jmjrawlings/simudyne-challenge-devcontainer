@@ -3,12 +3,31 @@
 ARG VARIANT=11-buster
 FROM mcr.microsoft.com/vscode/devcontainers/java:0-${VARIANT}
 
-ARG MAVEN_VERSION="3.6.3"
-RUN su root -c "umask 0002 && . /usr/local/sdkman/bin/sdkman-init.sh && sdk install maven \"${MAVEN_VERSION}\""
+USER root
+WORKDIR /root
 
-RUN mkdir ~/.simudyne
-COPY .simudyne/.license ~/.simudyne/.license
-COPY .simudyne/.settings.xml ~/.m2/.settings.xml
+# Install Maven
+ARG MAVEN_VERSION="3.6.3"
+RUN su -c "umask 0002 && . /usr/local/sdkman/bin/sdkman-init.sh && sdk install maven \"${MAVEN_VERSION}\""
+RUN mkdir -p .m2 
+
+# Copy Simudyne license to its expected location
+RUN mkdir .simudyne
+COPY .simudyne/.license .simudyne/
+
+# Use Simudyne Access Token to create the global Maven settings file
+COPY .simudyne/.token .simudyne/
+RUN ( \
+    echo '<?xml version="1.0" encoding="UTF-8"?><settings><servers><server><id>simudyne.jfrog.io</id>'; \
+    cat .simudyne/.token ; \
+    echo '</server></servers></settings>'\
+    ) >> .m2/settings.xml
+
+# Resolve project dependencies on container build (could also be done afterwards)
+RUN mkdir /model
+WORKDIR /model
+ADD pom.xml .
+RUN mvn dependency:resolve
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
