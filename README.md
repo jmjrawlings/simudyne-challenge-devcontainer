@@ -15,7 +15,7 @@ The included model is unchanged from Ben Schumanns apart from public field defin
 
 ## Requirements
 - [Visual Studio Code](https://code.visualstudio.com/)
-- [Remote Development Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
+- [Visual Studio Code Remote Development Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
 - [Docker](https://www.docker.com/)
 
 
