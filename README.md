@@ -6,10 +6,9 @@ The included model is unchanged from Ben Schumanns apart from public field defin
 
 
 ## Resources
-- [Original blog post by Ben Schumann](
-[https://www.benjamin-schumann.com/blog/2022/2/7/the-simudyne-hunger-games-improve-my-manufacturing-model-and-become-a-legend)
-- [LinkedIn Post](https://www.linkedin.com/pulse/simudyne-hunger-games-improve-my-manufacturing-model-schumann-phd/?trackingId=t4TSC%2BwQTvu3C6XXZw0BEg%3D%3D)
-- [Official Competition Page](https://docs.simudyne.com/challenges/ben_schumann_challenge/)
+- [Ben Schumann's blog post](https://www.benjamin-schumann.com/blog/2022/2/7/the-simudyne-hunger-games-improve-my-manufacturing-model-and-become-a-legend)
+- [Ben Schumann's LinkedIn Post](https://www.linkedin.com/pulse/simudyne-hunger-games-improve-my-manufacturing-model-schumann-phd/?trackingId=t4TSC%2BwQTvu3C6XXZw0BEg%3D%3D)
+- [Simudyne Competition Page](https://docs.simudyne.com/challenges/ben_schumann_challenge/)
 - [Simudyne Website](https://simudyne.com/)
 - [Simudyne SDK Documentation](https://docs.simudyne.com/)
 
