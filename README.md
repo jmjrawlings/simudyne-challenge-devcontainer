@@ -10,14 +10,15 @@ This repository is structured to help you get going with the Simudyne Hunger Gam
 
 
 ## Quickstart
-- Ensure Docker is running `docker ps`
+- Ensure Docker is running `docker info`
 - Clone repo locally
+- Place your Simudyne access token at [.simudyne/.token](.simudyne/.token)
+- Place your Simudyne license file at [.simudyne/.license](.simudyne/.license)
 - Open repo in VSCode
-- Replace the empty Simudyne access token at [./simudyne/.token]
-- Replace the empty Simudyne license file at [./simudyne/.license]
-- From inside VSCode - `CTRL+SHIFT+P` "Reopen in container"
-- F5 to run the main java class
-- open http://localhost:8080/
+- `CTRL+SHIFT+P` "Remote-Container: Reopen folder in container"
+    - This will take a few minutes on first open
+- Hit `F5` to run the main java class
+- Simudyne should now be running at http://localhost:8080/
 
 
 ## Details
