@@ -42,9 +42,7 @@ Instead of this:
                 // 2. conveyors: get products from upstream machine. Push out oldest if downstream is free (must be in 1 func)
                 Conveyor.receiveProductAndPushOutOldest(),
                 // 3. machine receives product from upstream for next tick
-                Machine.receiveProductForWork(),
-                Conveyor.advanceAllProducts(),
-                Conveyor.addNewProducts()
+                Machine.receiveProductForWork()
         );
 
         run( // after adjusting conveyor queues, move all products by conveyor speed
