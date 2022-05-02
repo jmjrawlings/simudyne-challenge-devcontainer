@@ -22,6 +22,7 @@ public class Factory extends AgentBasedModel<Globals> {
     public String B;
 
     public long startTime;
+    public long runStartTime;
 
     @Override
     public void init() {
@@ -66,6 +67,12 @@ public class Factory extends AgentBasedModel<Globals> {
         super.step(); // FIRST: do Simudyne stepping
         // seed model with initial products (only on first step)
 
+        long curTick = getContext().getTick();
+
+        if (curTick==0)
+        {
+            runStartTime = System.currentTimeMillis();
+        }
 
         firstStep(
                 Split.create(
@@ -86,23 +93,14 @@ public class Factory extends AgentBasedModel<Globals> {
                 // 2. conveyors: get products from upstream machine. Push out oldest if downstream is free (must be in 1 func)
                 Conveyor.receiveProductAndPushOutOldest(),
                 // 3. machine receives product from upstream for next tick
-                Machine.receiveProductForWork()
-        );
-
-
-        run( // after adjusting conveyor queues, move all products by conveyor speed
-                Conveyor.advanceAllProducts()
-        );
-
-
-        run( // let new products enter the system regularly
+                Machine.receiveProductForWork(),
+                Conveyor.advanceAllProducts(),
                 Conveyor.addNewProducts()
         );
 
-//        lastStep(
-//                // add actions for final outputs
-//        );
-
+        if (curTick == 9999) {
+                logger.info("Total Run time = " + (System.currentTimeMillis() - runStartTime));
+        }
     }
 
     @Override

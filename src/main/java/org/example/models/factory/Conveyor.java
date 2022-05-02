@@ -1,7 +1,5 @@
 package org.example.models.factory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import simudyne.core.abm.Action;
 import simudyne.core.abm.Agent;
 import simudyne.core.annotations.Constant;
@@ -10,7 +8,6 @@ import simudyne.core.annotations.Variable;
 import java.util.LinkedList;
 
 public class Conveyor extends Agent<Globals> {
-    private static final Logger logger = LoggerFactory.getLogger("org.example.models.factory");
     /**
      * FIFO queue of all products currently queuing in this conveyor
      */
@@ -113,7 +110,6 @@ public class Conveyor extends Agent<Globals> {
      */
     public static Action<Conveyor> advanceAllProducts() {
         return Action.create(Conveyor.class, currConveyor -> {
-            int index = 0;
             Product previousProduct = null;
             for (Product currProd : currConveyor.queue) { // from oldest to newest (assumes you already pushed out any old products downstream)
                 // move forward but do not fall conveyor edge or bump into preceeding product

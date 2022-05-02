@@ -1,8 +1,5 @@
 package org.example.models.factory;
 
-import simudyne.core.abm.Action;
-import simudyne.core.abm.Agent;
-
 /**
  * Products are not agents but simple objects to speed up processing speeds. Suggested by Jiyan on 2021_12_16
  * @author Benjamin.Schumann@gmail.com
