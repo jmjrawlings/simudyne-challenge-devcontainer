@@ -1,11 +1,11 @@
 # SOLUTION: Simudyne Hunger Games
 
 ## Baseline
-There is a significant variation in total run time for executions using the exact environment, same code, scenario and settings. This is very strange because the code uses a seed to generate randomness, so in principle it should have a deterministic run time. It happens both using it in Docker and from my local machine.
+There is a significant variation in total run time for executions using the same environment, code, scenario and settings. This is strange because the code uses a seed to generate randomness, so in principle it should have a deterministic run time. It happens both using it in Docker and from my local machine.
 
-To work around this problem, I ran each code variation several consecutive times. Normally the first time you get a longer run time, and after that it tends to converge. I run each variation 4 times.
+To work around this problem, I ran each code variation consecutively. Normally, the first time you get a longer run time, and after that it tends to converge. I run each variation 4 times.
 
-I used a long model length (10,000 ticks) instead of the default 60 to try to reduce that variation even more.
+I used 10,000 ticks as model length instead of the default 60 ticks to try to reduce the variation even more.
 
 Each run was executed using `mvn clean compile exec:java`.
 
@@ -31,7 +31,7 @@ The values seen in the Console at the last step (10,000) pretty much remain cons
 
 ### v1: Group together all runs
 
-Group together all the different segments comprising a `step()` in the `Factory` class.
+I group together all the different segments comprising a `step()` in the `Factory` class.
 
 Instead of this:
 
@@ -53,7 +53,7 @@ Instead of this:
                 Conveyor.addNewProducts()
         );
 
-We do this:
+I do this:
 
         run(
                 // 1. machine finishes product -> push downstream AND flag upstream that you have space (must be in 1 func)
@@ -67,24 +67,24 @@ We do this:
         );
 
 ### v2: Disable Unnecessary Loggers
-In addition to changes of v1, disable Loggers from everywhere except `Factory` class. This should in principle free up a little more additional resources.
+In addition to changes of v1, I disabled loggers everywhere except the `Factory` class. This frees up CPU/Memory resources.
 
 ### v3: Discretization and Split
 
 #### Discretization
-Discretize means that now each tick will be `K` times faster, where `K` is a parameter that is chosen so that there is a good balance between the end result (as measured by the output KPIs in the console) and run time. The benchmark is the number of products done with no discretization applied `(K=1, NUMPRODUCTSDONE.HIGH=1.32K)`
+In addition to the changes of v2, I applied step discretization, meaning that now each tick will be `K` times faster, where `K` is a parameter that is chosen so that there is a good balance between the end result (as measured by the output KPIs in the console) and run time. The benchmark is the number of products done when no discretization is applied `(K=1, NUMPRODUCTSDONE.HIGH=1.32K)`
 
-Originally I tried `K`=0.1/0.002223 = `45ms`. The assumption was that since each product is 0.1 meters and the speed is 0.002223 m/s, I could consider this as a basic discrete step.
+Originally, I tried `K`=0.1/0.002223 = `45ms` (rounded from 44.9842...ms). The assumption was that since each product is 0.1m and the speed is 0.002223 m/ms, I could consider this as a basic discrete step.
 
-The problem with using `K=45ms` is that the cycle time of a product in a machine is 10ms, which means some products will take this amount of time to be machined. As a result, machines will not be able to notify upstream conveyors after 10ms (they would need to wait until the whole 45ms step is over). Therefore, the factory will have a lower throughput. This was observed in the Console `(K=45, NUMPRODUCTSDONE.HIGH=903)`. Hence, we should at least reduce to `K=10 ms`.
+However, using `K=45ms` did not work as I expected. That is because the minimum cycle time of a product in a machine is defined as `cycleTimeMin_ticks=10ms`, which means some products may take this amount of time to be machined. As a result, machines will not be able to notify upstream conveyors after 10ms (they would need to wait until the whole 45ms step is over). Those machines will be idle for a few milliseconds, and therefore, the factory will have a lower throughput overall. This was observed in the Console `(K=45, NUMPRODUCTSDONE.HIGH=903)`. Hence, we should at least reduce to `K=10ms`.
 
-However, using `K=10ms` still did not produce an acceptable throughput `(K=10, NUMPRODUCTSDONE.HIGH=1.21K)`. That's because  basic 45ms that it takes for a product to take the slot of a previous product will sill produce multiples of 5. Hence, we came up with `K=5ms` which produces a throughput that is quite close to the benchmark `(K=5, NUMPRODUCTSDONE.HIGH=1.26K)` and reduces the execution time roughly 1/5.
+But still, using `K=10ms` did not produce an acceptable throughput: `(K=10, NUMPRODUCTSDONE.HIGH=1.21K)`. 1.21K products produced represents an 8% reduction with respect to the baseline (1.21K/1.32K=91.6%). Why? Since it takes ~45ms for a product to take the "slot" of the previous product in a conveyor, the total amount of time it will take for the product to walk across the conveyor will be 45ms * (9000m/0.1m) * 0.00223m/ms = 9003.15ms. This is not divisible by 10ms and it would cause the conveyor to be iddle (in some cases) for an additional 7ms. Hence, we came up with `K=5ms` which produces a throughput that is quite close to the benchmark `(K=5, NUMPRODUCTSDONE.HIGH=1.26K)` and reduces the execution time by roughly 1/5. This comes at a traded off cost of a tiny 4.5% reduction in throughput (1.26K/1.32K=95.45%).
 
-**NOTE:** When using discretization, you should now reduce the Model lenght (ticks) by `K`. So, for `K=5` insted of using 10,000 ticks if we use 2,000 ticks.
+**NOTE:** When using discretization, you should now divide the console **Model lenght (ticks)** by `K`. So, for `K=5` insted of using 10,000 ticks you should use 2,000 ticks.
 
 #### Split
 
-In this version we additionally introduce parallelization of two calls: `Machine.receiveProductForWork()` // `Conveyor.advanceAllProducts()` using `split()`. The intuition is that these two steps can be run independently and therefore in parallel, which should result in further reduction in run time.
+In this version, we additionally tried to introduce parallelization of two calls: `Machine.receiveProductForWork()` // `Conveyor.advanceAllProducts()` using `split()`. The intuition is that these two steps can be run independently and therefore in parallel, which should result in further reduction in run time.
 
         run(
                 // 1. machine finishes product -> push downstream AND flag upstream that you have space (must be in 1 func)
@@ -99,15 +99,13 @@ In this version we additionally introduce parallelization of two calls: `Machine
         );
 
 ## Results
-Pasted below are the run times experienced on my computer (Apple M1 Pro 16GB Memory) and docker configuration (`VARIANT=16-bullseye`, with the following allocated resources: 6 CPUs, 14GB RAM, 3GB Swap, 200GB Disk image size).
-
-The reduction goal in run time was "~50%".
+Below are the run times experienced on my computer (Apple M1 Pro 16GB Memory) using a `VARIANT=16-bullseye` Docker configuration, with the following resources allocated to Docker: 6 CPUs, 14GB RAM, 3GB Swap, 200GB Disk image size). **The reduction goal in run time was "~50%" and I was able to reduce it by 48% on v2 and 86% in v3 😌**.  
 
 ### v0: Baseline (10,000 ticks)
-    2022-05-02 10:51:24,993 [INFO] [Simudyne-akka.actor.default-dispatcher-12] org.example.models.factory - Total Run time = 11879
-    2022-05-02 10:53:20,701 [INFO] [Simudyne-akka.actor.default-dispatcher-6] org.example.models.factory - Total Run time = 8938
-    2022-05-02 10:55:11,118 [INFO] [Simudyne-akka.actor.default-dispatcher-7] org.example.models.factory - Total Run time = 9102
-    2022-05-02 10:57:53,346 [INFO] [Simudyne-akka.actor.default-dispatcher-11] org.example.models.factory - Total Run time = 8431
+    2022-05-02 10:51:24,993 [INFO] [Simudyne-akka.actor.default-dispatcher-12] factory - Total Run time = 11879
+    2022-05-02 10:53:20,701 [INFO] [Simudyne-akka.actor.default-dispatcher-6] factory - Total Run time = 8938
+    2022-05-02 10:55:11,118 [INFO] [Simudyne-akka.actor.default-dispatcher-7] factory - Total Run time = 9102
+    2022-05-02 10:57:53,346 [INFO] [Simudyne-akka.actor.default-dispatcher-11] factory - Total Run time = 8431
 
 **Average:** 9587.5 ms
 
@@ -129,7 +127,7 @@ The reduction goal in run time was "~50%".
 
 **Average:** 4972.8 ms
 
-**Run Time reduction vs baseline:** 48.13%%
+**Run Time reduction vs baseline:** 48.13%
 
 ### v3: Discretization and Split (K=5, 2,000 ticks)
         2022-05-03 05:52:41,745 [INFO] [Simudyne-akka.actor.default-dispatcher-16] factory - Total Run time = 1395
