@@ -83,7 +83,7 @@ public class Machine extends Agent<Globals> {
         if (currentProduct != null) {
             long currTick = getContext().getTick();
             long startTick = currentProduct.startedAt_tick;
-            long ticksSoFar = currTick - startTick;
+            long ticksSoFar = (currTick - startTick)*getGlobals().discreteStep;
 
             if (ticksSoFar >= currentProduct.cycleTime_ticks) {
                 // logger.info("product done in machine "+getID()+" on tick "+getContext().getTick());

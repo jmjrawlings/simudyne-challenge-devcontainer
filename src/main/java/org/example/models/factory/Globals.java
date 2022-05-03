@@ -17,5 +17,7 @@ public final class Globals extends GlobalState {
 
     @Input(name = "max cycle time (ms)")
     public double cycleTimeMax_ticks = 80; // mean CT is about 47ms
-
+    
+    @Input(name = "Discrete Steps Multipler")
+    public int discreteStep = 5;
 }

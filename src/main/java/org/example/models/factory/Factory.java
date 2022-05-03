@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import simudyne.core.abm.AgentBasedModel;
 import simudyne.core.abm.Group;
 import simudyne.core.abm.Split;
-import simudyne.core.annotations.Input;
 import simudyne.core.annotations.ModelSettings;
 import simudyne.core.data.CSVSource;
 
@@ -13,14 +12,8 @@ import java.io.File;
 
 @ModelSettings(timeUnit = "MILLIS")
 public class Factory extends AgentBasedModel<Globals> {
-    private static final Logger logger = LoggerFactory.getLogger("org.example.models.factory");
+    private static final Logger logger = LoggerFactory.getLogger("factory");
     
-    @Input
-    public String A;
-    
-    @Input
-    public String B;
-
     public long startTime;
     public long runStartTime;
 
@@ -93,12 +86,12 @@ public class Factory extends AgentBasedModel<Globals> {
                 // 2. conveyors: get products from upstream machine. Push out oldest if downstream is free (must be in 1 func)
                 Conveyor.receiveProductAndPushOutOldest(),
                 // 3. machine receives product from upstream for next tick
-                Machine.receiveProductForWork(),
-                Conveyor.advanceAllProducts(),
+                Split.create(Machine.receiveProductForWork(),
+                Conveyor.advanceAllProducts()),
                 Conveyor.addNewProducts()
         );
 
-        if (curTick == 9999) {
+        if (curTick == Math.ceil(9999/getGlobals().discreteStep)) {
                 logger.info("Total Run time = " + (System.currentTimeMillis() - runStartTime));
         }
     }
