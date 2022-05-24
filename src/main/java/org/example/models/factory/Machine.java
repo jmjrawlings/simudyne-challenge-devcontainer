@@ -1,14 +1,11 @@
 package org.example.models.factory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import simudyne.core.abm.Action;
 import simudyne.core.abm.Agent;
 import simudyne.core.annotations.Constant;
 import simudyne.core.annotations.Variable;
 
 public class Machine extends Agent<Globals> {
-    private static final Logger logger = LoggerFactory.getLogger("org.example.models.factory");
     /**
      * product currently processed at this machine. Null if none here
      */
@@ -60,11 +57,8 @@ public class Machine extends Agent<Globals> {
                         currMachine.getLinks(Links.Link_MachineToUpstreamConveyor.class).
                                 send(Messages.Msg_ReadyForProduct.class);
                     }
-                } // else let machine continue for more ticks with current product
-            } else{
-                logger.debug("at tick "+ currMachine.getContext().getTick()+" found that machine "+currMachine.getID()+" has no prod");
-            }
-
+                }
+            } 
         });
     }
 
@@ -89,7 +83,7 @@ public class Machine extends Agent<Globals> {
         if (currentProduct != null) {
             long currTick = getContext().getTick();
             long startTick = currentProduct.startedAt_tick;
-            long ticksSoFar = currTick - startTick;
+            long ticksSoFar = (currTick - startTick)*getGlobals().discreteStep;
 
             if (ticksSoFar >= currentProduct.cycleTime_ticks) {
                 // logger.info("product done in machine "+getID()+" on tick "+getContext().getTick());
